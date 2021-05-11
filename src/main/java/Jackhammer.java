@@ -1,5 +1,5 @@
 public class Jackhammer extends Tool {
-    // Constants for the Chainsaw tool class
+    /* Constants for the Chainsaw tool class */
     private static final String RIDGID = "Ridgid";
     private static final String JAKR = "JAKR";
     private static final String DEWALT = "DeWalt";
@@ -8,7 +8,6 @@ public class Jackhammer extends Tool {
     private static final boolean HOLIDAY_CHARGE = false;
     public static final double CHARGE = 2.99;
 
-    // Constructor
     Jackhammer(String code) {
         this.toolCode = code;
         if(code.equals(JAKR)) {

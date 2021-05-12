@@ -38,6 +38,10 @@ public class RentalAgreement {
         this.finalCharge = roundCurrency(preDiscountAmount - discountAmount);
     }
 
+    /**
+     * Rental report is a String that is shown to the user at the end of check out.
+     * @return a formatted String of information from the rental agreement
+     */
     protected String generateRentalReport() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yy");
         return "Tool code: " + tool.getToolCode() +

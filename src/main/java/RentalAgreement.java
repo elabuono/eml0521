@@ -35,10 +35,10 @@ public class RentalAgreement {
         this.chargeDays = calculateChargeableDays(tool, checkoutDate, rentalDays);
         this.preDiscountAmount = roundCurrency(chargeDays * tool.getDailyCharge());
         this.discountAmount = roundCurrency(preDiscountAmount * (discount * 0.01));
-        this.finalCharge = preDiscountAmount - discountAmount;
+        this.finalCharge = roundCurrency(preDiscountAmount - discountAmount);
     }
 
-    public String generateRentalReport() {
+    protected String generateRentalReport() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yy");
         return "Tool code: " + tool.getToolCode() +
                 "\nTool type: " + tool.getClass().getName() +
@@ -48,7 +48,7 @@ public class RentalAgreement {
                 "\nDue date: " + dueDate.format(formatter) +
                 "\nDaily rental charge: $" + tool.getDailyCharge() +
                 "\nCharge days: " + chargeDays +
-                "\nPre-discount charge: " + String.format("%.2f", preDiscountAmount) +
+                "\nPre-discount charge: $" + String.format("%.2f", preDiscountAmount) +
                 "\nDiscount percent: " + discount + "%" +
                 "\nDiscount amount: $" + String.format("%.2f", discountAmount) +
                 "\nFinal charge: $" + String.format("%.2f", finalCharge)
@@ -70,19 +70,16 @@ public class RentalAgreement {
         LocalDate checkedDay = checkoutDate.plusDays(1);
 
         while (dayCounter < rentalDays) {
-            if(!isWeekendCharged) {
-                if(checkedDay.getDayOfWeek() == DayOfWeek.SATURDAY ||
-                   checkedDay.getDayOfWeek() == DayOfWeek.SUNDAY ) {
-                    checkedDay = checkedDay.plusDays(1);
-                    dayCounter++;
-                    continue;
-                }
-            } else if(!isHolidayCharged) {
-                if(isHoliday(checkedDay)) {
-                    checkedDay = checkedDay.plusDays(1);
-                    dayCounter++;
-                    continue;
-                }
+            if(!isWeekendCharged &&
+            (checkedDay.getDayOfWeek() == DayOfWeek.SATURDAY || checkedDay.getDayOfWeek() == DayOfWeek.SUNDAY)) {
+                checkedDay = checkedDay.plusDays(1);
+                dayCounter++;
+                continue;
+            }
+            if(!isHolidayCharged && isHoliday(checkedDay)) {
+                checkedDay = checkedDay.plusDays(1);
+                dayCounter++;
+                continue;
             }
             rentedDays++;
             checkedDay = checkedDay.plusDays(1);
@@ -105,13 +102,14 @@ public class RentalAgreement {
                 (currentDay <= 7) &&
                 (currentDayOfWeek == DayOfWeek.MONDAY)) {
             return true; // the 1st monday will be <= the 7th day of the month
-        } else if(currentMonth == Month.JULY &&
-                (currentDay >= 3 && currentDay <= 5)) {
+        } else if(currentMonth == Month.JULY) {
             if((currentDay == 4) && !(currentDayOfWeek == DayOfWeek.SATURDAY || currentDayOfWeek == DayOfWeek.SUNDAY)) {
                 return true; // non-weekend 4th of July is observed holiday
-            } else if ((currentDay == 3) && (currentDayOfWeek == DayOfWeek.FRIDAY)) {
+            }
+            else if ((currentDay == 3) && (currentDayOfWeek == DayOfWeek.FRIDAY)) {
                 return true; // the 4th is on Saturday, thus 3rd is holiday
-            } else if ((currentDay == 5) && (currentDayOfWeek == DayOfWeek.MONDAY)) {
+            }
+            else if ((currentDay == 5) && (currentDayOfWeek == DayOfWeek.MONDAY)) {
                 return true; // the 4th is on Sunday, thus 5th is holiday
             }
         }
